@@ -43,6 +43,6 @@ public class Contacts {
 
     @Override
     public String toString() {
-        return "Name: " + name + "\nPhoneNumber: " + phoneNumber + "\nEmail: " + email;
+        return name + "," + phoneNumber + "," + email;
     }
 }

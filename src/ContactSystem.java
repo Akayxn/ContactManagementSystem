@@ -1,13 +1,14 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ContactSystem {
+    private static ArrayList<Contacts> contactList = new ArrayList<>();
     public static void main(String[] args) {
-        boolean runcontact = false;
+        loadContacts(); //loading the existing contacts at startups
+        boolean runcontact = true;
         Scanner scanner = new Scanner(System.in);
-        while(!runcontact){
+        while(runcontact){
             System.out.println("1. Add Contacts.");
             System.out.println("2. View Contacts.");
             System.out.println("3. Update Contacts.");
@@ -29,7 +30,7 @@ public class ContactSystem {
                     removeContact();
                     break;
                 case 5:
-                    runcontact = true;
+                    runcontact = false;
                     System.out.println("You have exited the program.");
                     break;
                 default:
@@ -42,36 +43,12 @@ public class ContactSystem {
         }
 
 
-
-
-
-
-
-
-
-
-
-
-    }
-    private static void viewContact() {
-
-
-
-    }
-
-    private static void updateContact() {
-
-    }
-
-    private static void removeContact() {
     }
 
 
 
 
-    //adds the contacts into a textfile.
     private static  void addContact(){
-        ArrayList<Contacts> contactList = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter the contact's name: ");
@@ -87,15 +64,82 @@ public class ContactSystem {
         Contacts contacts = new Contacts(name,phoneNumber,email);
         contactList.add(contacts);
         try {
-            FileWriter fileWriter = new FileWriter("Contacts.txt");
-            fileWriter.write(String.valueOf(contactList));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("Contacts.txt"));
+            writer.write(contacts.toString() + "\n");
             System.out.println("Contact Successfully added.");
-            fileWriter.close();
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error Saving the Contact " + e.getMessage());
+        }
+
+    }
+
+    private static void viewContact() {
+        if(contactList.isEmpty()){
+            System.out.println("No contacts available.");
+            return;
+        }
+
+        System.out.println("\nNow Viewing the Contacts");
+        for(Contacts contacts : contactList){
+            System.out.println("Name: " + contacts.getName() + ",Phone Number: " + contacts.getPhoneNumber() + ", Email: " + contacts.getEmail());
+        }
+
+    }
+
+    private static void updateContact() {
+        char contactData1 = 0;
+        try { // Reading the file to keep the old values.
+            FileReader fileReader = new FileReader("Contacts.txt");
+            int contactData = fileReader.read(); //getting the byte data from txt file.
+            System.out.println("\nNow Viewing the Contacts:");
+            while(contactData!=-1){
+                System.out.println(contactData);
+                contactData = fileReader.read();
+
+            }
+            System.out.println(contactData1);
+            fileReader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            FileWriter fileWriter = new FileWriter("Contacts.txt");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
+
+    private static void removeContact() {
+
+
+
+    }
+
+        // loads the contacts 
+     private static void loadContacts(){
+
+         try {
+             BufferedReader reader = new BufferedReader(new FileReader("Contacts.txt"));
+             String line;
+             while((line = reader.readLine()) !=null){
+                 String[] parts = line.split(",");
+                 if(parts.length == 3){
+                     Contacts contact = new Contacts(parts[0],Long.parseLong(parts[1]),parts[2]);
+                     contactList.add(contact);
+                 }
+             }
+         } catch (FileNotFoundException e) {
+             throw new RuntimeException(e);
+         } catch (IOException e) {
+             throw new RuntimeException(e);
+         }
+
+
+     }
+
 
 
 }
