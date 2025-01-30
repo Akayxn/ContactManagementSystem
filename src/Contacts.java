@@ -2,12 +2,21 @@ public class Contacts {
     private String name;
     private long phoneNumber;
     private String email;
+    private int id;
 
     // Constructor
     Contacts(){
+        id = 10101;
         name = "No Name";
         phoneNumber = 1122334455;
         email = "noname@gmail.com";
+    }
+
+    Contacts(int id,String name, long phoneNumber, String email){
+        this.id = id;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
     }
 
     Contacts(String name, long phoneNumber, String email){
@@ -16,7 +25,17 @@ public class Contacts {
         this.email = email;
     }
 
+
     // getters and setters methods.
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
     public String getName() {
         return name;
     }
@@ -43,6 +62,6 @@ public class Contacts {
 
     @Override
     public String toString() {
-        return name + "," + phoneNumber + "," + email;
+        return id + "," + name + "," + phoneNumber + "," + email;
     }
 }

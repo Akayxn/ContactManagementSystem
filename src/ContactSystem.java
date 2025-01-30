@@ -11,23 +11,23 @@ public class ContactSystem {
         while(runcontact){
             System.out.println("1. Add Contacts.");
             System.out.println("2. View Contacts.");
-            System.out.println("3. Update Contacts.");
-            System.out.println("4. Remove Contacts.");
-            System.out.println("5. Exit The Program.");
+            System.out.println("3. Remove Contacts.");
+            System.out.println("4. Update Contacts.");
+            System.out.println("5. Exit the Program");
             System.out.print("Enter your choice:");
             int choice = scanner.nextInt();
             switch(choice){
                 case 1:
-                    addContact();
+                    addContact(scanner);
                     break;
                 case 2:
                     viewContact();
                     break;
                 case 3:
-                    updateContact();
+                    removeContact(scanner);
                     break;
                 case 4:
-                    removeContact();
+                    updateContact(scanner);
                     break;
                 case 5:
                     runcontact = false;
@@ -39,17 +39,18 @@ public class ContactSystem {
             }
 
 
-
         }
 
-
+        scanner.close();
     }
 
 
 
 
-    private static  void addContact(){
-        Scanner scanner = new Scanner(System.in);
+    private static  void addContact(Scanner scanner){
+        System.out.print("Enter the contact's id: ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); //consume the extra line made by nextint;
 
         System.out.print("Enter the contact's name: ");
         String name = scanner.nextLine();
@@ -61,7 +62,7 @@ public class ContactSystem {
         System.out.print("Enter the contact's email:");
         String email = scanner.nextLine();
 
-        Contacts contacts = new Contacts(name,phoneNumber,email);
+        Contacts contacts = new Contacts(id,name,phoneNumber,email);
         contactList.add(contacts);
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("Contacts.txt"));
@@ -82,43 +83,74 @@ public class ContactSystem {
 
         System.out.println("\nNow Viewing the Contacts");
         for(Contacts contacts : contactList){
-            System.out.println("Name: " + contacts.getName() + ",Phone Number: " + contacts.getPhoneNumber() + ", Email: " + contacts.getEmail());
+            System.out.println("Id: " + contacts.getId() + ",Name: " + contacts.getName() + ",Phone Number: " + contacts.getPhoneNumber() + ", Email: " + contacts.getEmail());
         }
 
     }
 
-    private static void updateContact() {
-        char contactData1 = 0;
-        try { // Reading the file to keep the old values.
-            FileReader fileReader = new FileReader("Contacts.txt");
-            int contactData = fileReader.read(); //getting the byte data from txt file.
-            System.out.println("\nNow Viewing the Contacts:");
-            while(contactData!=-1){
-                System.out.println(contactData);
-                contactData = fileReader.read();
+
+    private static void removeContact(Scanner scanner) {
+        viewContact();
+
+        if(contactList.isEmpty()){
+            System.out.println("No Contacts Availabe to remove.");
+            return;} // returns nothing if its empty
+
+        System.out.print("Enter the id of the contact you want to remove:");
+        int contactoRemove = scanner.nextInt();
+
+        for(int i = 0;i< contactList.size();i++){
+            if(contactList.get(i).getId()==(contactoRemove)){
+                contactList.remove(i);
+                saveallContacts(); // saves the current info in the text file.
+                System.out.println("Contact Successfully removed.");
+                return;
+            }
+        }
+
+        System.out.println("Contact not Found.");
+
+    }
+
+    private static void updateContact(Scanner scanner){
+        viewContact();
+        if(contactList.isEmpty()){
+            return;}
+
+        System.out.print("Enter the id of the contact to update:");
+        int contactToUpdate = scanner.nextInt();
+        scanner.nextLine(); //consume the extra line created by nextInt();
+        for(Contacts contact:contactList){
+            if(contact.getId()==contactToUpdate){
+                System.out.print("Enter new name (Leave empty to keep current):");
+                String name = scanner.nextLine();
+                if(!name.isEmpty()){
+                    contact.setName(name);
+                }
+
+
+                System.out.print("Enter new phone number (Leave empty to keep current):");
+                String phoneNumber = scanner.nextLine();
+                if(!phoneNumber.isEmpty()){
+                    long numberToUpdate = Long.parseLong(phoneNumber); // changing the Strings to long.
+                    contact.setPhoneNumber(numberToUpdate);
+                }
+
+                System.out.print("Enter new phone number (Leave empty to keep current):");
+                String email = scanner.nextLine();
+                if(!email.isEmpty()){
+                    contact.setEmail(email);
+                }
+
+                saveallContacts();
 
             }
-            System.out.println(contactData1);
-            fileReader.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
-
-        try {
-            FileWriter fileWriter = new FileWriter("Contacts.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    private static void removeContact() {
-
 
 
     }
 
-        // loads the contacts 
+        // loads the contacts
      private static void loadContacts(){
 
          try {
@@ -126,8 +158,8 @@ public class ContactSystem {
              String line;
              while((line = reader.readLine()) !=null){
                  String[] parts = line.split(",");
-                 if(parts.length == 3){
-                     Contacts contact = new Contacts(parts[0],Long.parseLong(parts[1]),parts[2]);
+                 if(parts.length == 4){
+                     Contacts contact = new Contacts(Integer.parseInt(parts[0]),parts[1],Long.parseLong(parts[2]),parts[3]);
                      contactList.add(contact);
                  }
              }
@@ -137,8 +169,22 @@ public class ContactSystem {
              throw new RuntimeException(e);
          }
 
-
      }
+
+
+    private static void saveallContacts(){
+        try {
+            FileWriter fileWriter = new FileWriter("Contacts.txt");
+
+            for(Contacts contact : contactList){
+                fileWriter.write(contact.toString() + "\n");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 
