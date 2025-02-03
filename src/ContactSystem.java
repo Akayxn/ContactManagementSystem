@@ -136,7 +136,7 @@ public class ContactSystem {
                     contact.setPhoneNumber(numberToUpdate);
                 }
 
-                System.out.print("Enter new phone number (Leave empty to keep current):");
+                System.out.print("Enter new email (Leave empty to keep current):");
                 String email = scanner.nextLine();
                 if(!email.isEmpty()){
                     contact.setEmail(email);
